@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var colors  = require('colors');
+var prompt  = require('prompt');
+
+var Game = require('./lib/game');
+var instructions = require('./lib/instructions');
+
+var print = function(line) { console.log(line + '\n') };
+var clearScreen = function() { print('\033c') };
+
+program.version('0.0.1')
+  .option('-c, --cheat', 'Cheat by showing opponents positions')
+  .option('-v, --verbose', 'Print board after each turn')
+  .parse(process.argv);
+
+clearScreen();
+
+var game = new Game();
+print(('Welcome to Battleship!').bold.underline.cyan);
+print(instructions);
+
+game.positionShips();
+print('The board looks like this:');
+print(game.renderForConsole(program.cheat));
+
+print('Now... ' + 'Let\'s play!'.bold);
+
+var nextTurn = function() {
+  print('Commander'.bold + ', where shall I fire?');
+
+  var inputs = {
+    properties: {
+      column: {
+        message: 'Must be a column from A to J',
+        pattern: /^[A-J]$/,
+        required: true,
+        type: 'string'
+      },
+      row: {
+        message: 'Must be a row number from 1 to 10',
+        pattern: /^[1-9]|10$/,
+        required: true,
+        type: 'number'
+      }
+    }
+  };
+
+  prompt.start();
+  prompt.get(inputs, function(err, input) {
+    if (err) { return print('Boo... Quitters never win!') };
+
+    clearScreen();
+    print('Firing at ' + input.column + input.row + '...');
+    game.fireTorpedo(input);
+
+    if (program.verbose) print(game.renderForConsole(program.cheat));
+    if (game.getStats().hits < 17) nextTurn();
+  });
+}
+
+nextTurn();

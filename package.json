@@ -1,0 +1,10 @@
+{
+  "name": "battleship",
+  "description": "A simple implementation of the classic game Battleship",
+  "version": "0.0.1",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "commander": "^2.9.0",
+    "prompt": "^1.0.0"
+  }
+}
